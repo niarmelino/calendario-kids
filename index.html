@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Turnos de maestros — Kids</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --teal-deep:   #0E6E6A;
+    --teal:        #17968F;
+    --aqua:        #4FD1C0;
+    --sun:         #F6C445;
+    --cream:       #FBFBF6;
+    --ink:         #0B3634;
+    --ink-soft:    #3E5E5C;
+    --card-shadow: 0 10px 26px rgba(9,60,57,.14);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  body{
+    margin:0;
+    min-height:100%;
+    font-family:'Nunito',sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(120% 90% at 0% 0%, rgba(255,255,255,.18), transparent 55%),
+      linear-gradient(135deg, var(--teal-deep) 0%, var(--teal) 38%, var(--aqua) 72%, var(--sun) 100%);
+    padding:calc(28px + env(safe-area-inset-top,0px)) 20px calc(40px + env(safe-area-inset-bottom,0px));
+  }
+  .wrap{max-width:920px;margin:0 auto;}
+
+  header.page{
+    text-align:left;
+    color:#fff;
+    margin-bottom:28px;
+  }
+  header.page .eyebrow{
+    font-weight:800;
+    font-size:.82rem;
+    letter-spacing:.02em;
+    color:rgba(255,255,255,.85);
+    margin:0 0 4px;
+  }
+  header.page h1{
+    font-family:'Baloo 2',sans-serif;
+    font-weight:800;
+    font-size:clamp(1.7rem,4.4vw,2.5rem);
+    margin:0;
+    line-height:1.05;
+    text-shadow:0 2px 10px rgba(6,45,43,.18);
+  }
+  header.page p{
+    margin:10px 0 0;
+    max-width:60ch;
+    color:rgba(255,255,255,.92);
+    font-size:.98rem;
+  }
+
+  .week{
+    background:rgba(255,255,255,.14);
+    border:1px solid rgba(255,255,255,.28);
+    border-radius:22px;
+    padding:20px;
+    margin-bottom:22px;
+    backdrop-filter:blur(2px);
+  }
+  .week h2{
+    font-family:'Baloo 2',sans-serif;
+    font-weight:800;
+    color:#fff;
+    font-size:clamp(1.25rem,3.4vw,1.7rem);
+    margin:2px 6px 16px;
+    text-shadow:0 2px 8px rgba(6,45,43,.2);
+  }
+
+  .cols-head{
+    display:grid;
+    grid-template-columns:96px 1fr 1fr;
+    gap:12px;
+    padding:0 4px;
+    margin-bottom:8px;
+  }
+  .cols-head span{
+    font-family:'Baloo 2',sans-serif;
+    font-weight:700;
+    color:#fff;
+    font-size:.95rem;
+  }
+  .cols-head .grandes{grid-column:2;}
+  .cols-head .peques{grid-column:3;}
+
+  .turno{
+    display:grid;
+    grid-template-columns:96px 1fr 1fr;
+    gap:12px;
+    align-items:stretch;
+    margin-bottom:10px;
+  }
+  .turno:last-child{margin-bottom:0;}
+
+  .turno-label{
+    display:flex;
+    align-items:center;
+    font-family:'Baloo 2',sans-serif;
+    font-weight:700;
+    color:#fff;
+    font-size:1.02rem;
+  }
+
+  .card{
+    background:var(--cream);
+    border-radius:14px;
+    box-shadow:var(--card-shadow);
+    padding:12px 14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-around;
+    gap:10px;
+    text-align:center;
+  }
+  .card .slot{display:flex;flex-direction:column;gap:2px;}
+  .card .role{
+    font-size:.72rem;
+    font-weight:800;
+    letter-spacing:.02em;
+    color:var(--ink-soft);
+  }
+  .card .name{
+    font-weight:800;
+    color:var(--teal-deep);
+    font-size:1rem;
+    line-height:1.15;
+  }
+  .card .divider{width:1px;align-self:stretch;background:#E3EFEE;}
+
+  .peques-card{justify-content:center;}
+
+  footer{
+    text-align:center;
+    color:rgba(255,255,255,.85);
+    font-size:.82rem;
+    margin-top:8px;
+  }
+
+  @media (max-width:560px){
+    .cols-head, .turno{grid-template-columns:64px 1fr 1fr;}
+    .turno-label{font-size:.9rem;}
+    .card{flex-direction:column;gap:6px;padding:10px 8px;}
+    .card .divider{display:none;}
+    .card .name{font-size:.92rem;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="page">
+    <p class="eyebrow">Kids — El Refugio</p>
+    <h1>Turnos de maestros</h1>
+    <p>Cronograma de seños por semana, franja horaria y grupo de edad.</p>
+  </header>
+
+  <div id="schedule"></div>
+  <footer>Agregá nuevas semanas editando el arreglo <code>semanas</code> en el código.</footer>
+</div>
+
+<script>
+// Cada semana es un objeto. Para agregar una semana nueva, sumá otro
+// elemento a este arreglo: el resto de la página se genera solo.
+const semanas = [
+  {
+    fecha: "20 de septiembre",
+    turnos: [
+      {
+        turno: "Mañana",
+        grandes: { seño: "Anita", ayudantes: "Solange y Yani" },
+        peques:  { seño: "Ludmi" }
+      },
+      {
+        turno: "Tarde",
+        grandes: { seño: "Mari", ayudantes: "Ana y Marian" },
+        peques:  { seño: "Juli" }
+      }
+    ]
+  },
+  {
+    fecha: "27 de septiembre",
+    turnos: [
+      {
+        turno: "Mañana",
+        grandes: { seño: "Claudia", ayudantes: "Raquel" },
+        peques:  { seño: "Flor y Santi" }
+      },
+      {
+        turno: "Tarde",
+        grandes: { seño: "Andre", ayudantes: "Bibi" },
+        peques:  { seño: "Mary y Alexis" }
+      }
+    ]
+  }
+];
+
+function grandesCard(g){
+  return `<div class="card grandes-card">
+      <div class="slot"><span class="role">SEÑO</span><span class="name">${g.seño}</span></div>
+      <div class="divider"></div>
+      <div class="slot"><span class="role">AYUDA</span><span class="name">${g.ayudantes}</span></div>
+    </div>`;
+}
+function pequesCard(p){
+  return `<div class="card peques-card">
+      <div class="slot"><span class="role">SEÑO</span><span class="name">${p.seño}</span></div>
+    </div>`;
+}
+
+const root = document.getElementById('schedule');
+root.innerHTML = semanas.map(sem => `
+  <section class="week">
+    <h2>${sem.fecha}</h2>
+    <div class="cols-head">
+      <span></span>
+      <span class="grandes">Grandes (7 a 12 años)</span>
+      <span class="peques">Peques (4 a 6/7 años)</span>
+    </div>
+    ${sem.turnos.map(t => `
+      <div class="turno">
+        <div class="turno-label">${t.turno}</div>
+        ${grandesCard(t.grandes)}
+        ${pequesCard(t.peques)}
+      </div>
+    `).join('')}
+  </section>
+`).join('');
+</script>
+</body>
+</html>
