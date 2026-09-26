@@ -1,0 +1,34 @@
+{
+  "semanas": [
+    {
+      "fecha": "2026-09-20",
+      "turnos": [
+        {
+          "turno": "Mañana",
+          "grandes": { "seño": "Anita", "ayudantes": "Solange y Yani" },
+          "peques": { "seño": "Ludmi" }
+        },
+        {
+          "turno": "Tarde",
+          "grandes": { "seño": "Mari", "ayudantes": "Ana y Marian" },
+          "peques": { "seño": "Juli" }
+        }
+      ]
+    },
+    {
+      "fecha": "2026-09-27",
+      "turnos": [
+        {
+          "turno": "Mañana",
+          "grandes": { "seño": "Claudia", "ayudantes": "Raquel" },
+          "peques": { "seño": "Flor y Santi" }
+        },
+        {
+          "turno": "Tarde",
+          "grandes": { "seño": "Andre", "ayudantes": "Bibi" },
+          "peques": { "seño": "Mary y Alexis" }
+        }
+      ]
+    }
+  ]
+}

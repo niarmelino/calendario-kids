@@ -138,12 +138,21 @@
 
   .peques-card{justify-content:center;}
 
+  .estado{
+    margin:6px;
+    color:#fff;
+    font-size:.95rem;
+    line-height:1.45;
+  }
+
   footer{
     text-align:center;
     color:rgba(255,255,255,.85);
     font-size:.82rem;
     margin-top:8px;
   }
+  footer code, footer a{color:#fff;font-weight:700;}
+  footer a{text-decoration:underline;}
 
   @media (max-width:560px){
     .cols-head, .turno{grid-template-columns:64px 1fr 1fr;}
@@ -163,76 +172,122 @@
   </header>
 
   <div id="schedule"></div>
-  <footer>Agregá nuevas semanas editando el arreglo <code>semanas</code> en el código.</footer>
+  <footer>Para agregar o cambiar turnos, editá <a href="data.json"><code>data.json</code></a> y recargá la página. Solo se muestran las semanas desde hoy en adelante.</footer>
 </div>
 
 <script>
-// Cada semana es un objeto. Para agregar una semana nueva, sumá otro
-// elemento a este arreglo: el resto de la página se genera solo.
-const semanas = [
-  {
-    fecha: "20 de septiembre",
-    turnos: [
-      {
-        turno: "Mañana",
-        grandes: { seño: "Anita", ayudantes: "Solange y Yani" },
-        peques:  { seño: "Ludmi" }
-      },
-      {
-        turno: "Tarde",
-        grandes: { seño: "Mari", ayudantes: "Ana y Marian" },
-        peques:  { seño: "Juli" }
-      }
-    ]
-  },
-  {
-    fecha: "27 de septiembre",
-    turnos: [
-      {
-        turno: "Mañana",
-        grandes: { seño: "Claudia", ayudantes: "Raquel" },
-        peques:  { seño: "Flor y Santi" }
-      },
-      {
-        turno: "Tarde",
-        grandes: { seño: "Andre", ayudantes: "Bibi" },
-        peques:  { seño: "Mary y Alexis" }
-      }
-    ]
-  }
-];
-
-function grandesCard(g){
-  return `<div class="card grandes-card">
-      <div class="slot"><span class="role">SEÑO</span><span class="name">${g.seño}</span></div>
-      <div class="divider"></div>
-      <div class="slot"><span class="role">AYUDA</span><span class="name">${g.ayudantes}</span></div>
-    </div>`;
-}
-function pequesCard(p){
-  return `<div class="card peques-card">
-      <div class="slot"><span class="role">SEÑO</span><span class="name">${p.seño}</span></div>
-    </div>`;
-}
+// Los turnos viven en data.json. Para sumar o cambiar una semana, editá ese
+// archivo: esta página se genera sola al cargar.
+const DATA_URL = 'data.json';
 
 const root = document.getElementById('schedule');
-root.innerHTML = semanas.map(sem => `
+
+const esc = txt => String(txt ?? '')
+  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+// "2026-09-27" se parsea como UTC si se pasa tal cual, lo que corre un día el
+// filtro en horarios negativos (ej. Argentina). Con T00:00:00 es hora local.
+function aFechaLocal(iso){
+  const d = new Date(`${iso}T00:00:00`);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function hoyLocal(){
+  const ahora = new Date();
+  return new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
+}
+
+function tituloSemana(sem){
+  if (typeof sem.titulo === 'string' && sem.titulo.trim()) return esc(sem.titulo);
+  const d = aFechaLocal(sem.fecha);
+  if (!d) return esc(sem.fecha);
+  const txt = d.toLocaleDateString('es-AR', {
+    weekday: 'long', day: 'numeric', month: 'long'
+  });
+  return esc(txt.charAt(0).toUpperCase() + txt.slice(1));
+}
+
+// Un mismo renderer para Grandes y Peques: si el grupo trae "ayudantes", se
+// muestra la columna de ayuda; si no, queda solo el seño.
+function grupoCard(grupo, clase){
+  if (!grupo || !grupo.seño) return '';
+  const ayuda = (grupo.ayudantes && String(grupo.ayudantes).trim())
+    ? `<div class="divider"></div>
+       <div class="slot"><span class="role">AYUDA</span><span class="name">${esc(grupo.ayudantes)}</span></div>`
+    : '';
+  return `<div class="card ${clase}">
+      <div class="slot"><span class="role">SEÑO</span><span class="name">${esc(grupo.seño)}</span></div>
+      ${ayuda}
+    </div>`;
+}
+
+function semanaHTML(sem){
+  return `
   <section class="week">
-    <h2>${sem.fecha}</h2>
+    <h2>${tituloSemana(sem)}</h2>
     <div class="cols-head">
       <span></span>
       <span class="grandes">Grandes (7 a 12 años)</span>
       <span class="peques">Peques (4 a 6/7 años)</span>
     </div>
-    ${sem.turnos.map(t => `
+    ${(sem.turnos || []).map(t => `
       <div class="turno">
-        <div class="turno-label">${t.turno}</div>
-        ${grandesCard(t.grandes)}
-        ${pequesCard(t.peques)}
+        <div class="turno-label">${esc(t.turno)}</div>
+        ${grupoCard(t.grandes, 'grandes-card')}
+        ${grupoCard(t.peques, 'peques-card')}
       </div>
     `).join('')}
   </section>
-`).join('');
+`;
+}
+
+function estadoHTML(titulo, detalle){
+  return `
+  <section class="week">
+    <h2>${esc(titulo)}</h2>
+    <p class="estado">${detalle}</p>
+  </section>
+`;
+}
+
+function render(data){
+  const hoy = hoyLocal();
+  const semanas = (data && Array.isArray(data.semanas)) ? data.semanas : [];
+
+  const futuras = semanas
+    .map(sem => ({ sem, fecha: aFechaLocal(sem && sem.fecha) }))
+    .filter(item => item.fecha && item.fecha.getTime() >= hoy.getTime())
+    .sort((a, b) => a.fecha - b.fecha)
+    .map(item => item.sem);
+
+  if (futuras.length === 0){
+    root.innerHTML = estadoHTML(
+      'Sin turnos programados',
+      `No hay semanas cargadas con fecha igual o posterior a hoy (${esc(hoy.toLocaleDateString('es-AR'))}).`
+    );
+    return;
+  }
+  root.innerHTML = futuras.map(semanaHTML).join('');
+}
+
+async function cargar(){
+  root.innerHTML = estadoHTML('Cargando…', 'Buscando los turnos de la semana.');
+  try {
+    // no-store para que los cambios en data.json se vean al recargar la página.
+    const res = await fetch(DATA_URL, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    render(await res.json());
+  } catch (err) {
+    root.innerHTML = estadoHTML(
+      'No se pudieron cargar los turnos',
+      `No se pudo leer <code>${esc(DATA_URL)}</code>. Verificá que el archivo exista y esté junto al <code>index.html</code>.`
+    );
+    console.error(err);
+  }
+}
+
+cargar();
 </script>
 </body>
 </html>
