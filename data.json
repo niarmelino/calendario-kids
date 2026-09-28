@@ -1,32 +1,62 @@
 {
   "semanas": [
     {
-      "fecha": "2026-09-20",
+      "fecha": "2026-10-04",
       "turnos": [
         {
           "turno": "Mañana",
-          "grandes": { "seño": "Anita", "ayudantes": "Solange y Yani" },
-          "peques": { "seño": "Ludmi" }
+          "grandes": { "seño": "Anto", "ayudantes": "Raquel" },
+          "peques": { "seño": "Mary", "ayudantes": "Alexis" }
         },
         {
           "turno": "Tarde",
-          "grandes": { "seño": "Mari", "ayudantes": "Ana y Marian" },
-          "peques": { "seño": "Juli" }
+          "grandes": { "seño": "Andre", "ayudantes": "Lauri" },
+          "peques": { "seño": "Mariela", "ayudantes": "Agus y More" }
         }
       ]
     },
     {
-      "fecha": "2026-09-27",
+      "fecha": "2026-10-11",
       "turnos": [
         {
           "turno": "Mañana",
-          "grandes": { "seño": "Claudia", "ayudantes": "Raquel" },
-          "peques": { "seño": "Flor y Santi" }
+          "grandes": { "seño": "Anita", "ayudantes": "Solange" },
+          "peques": { "seño": "Ludmi", "ayudantes": "Lizi" }
         },
         {
           "turno": "Tarde",
-          "grandes": { "seño": "Andre", "ayudantes": "Bibi" },
-          "peques": { "seño": "Mary y Alexis" }
+          "grandes": { "seño": "Claudia", "ayudantes": "Bibi" },
+          "peques": { "seño": "Flor", "ayudantes": "Santi" }
+        }
+      ]
+    },
+    {
+      "fecha": "2026-10-18",
+      "turnos": [
+        {
+          "turno": "Mañana",
+          "grandes": { "seño": "Anto", "ayudantes": "Raquel" },
+          "peques": { "seño": "Juli", "ayudantes": "Luci" }
+        },
+        {
+          "turno": "Tarde",
+          "grandes": { "seño": "Andre", "ayudantes": "Lauri" },
+          "peques": { "seño": "Vicky", "ayudantes": "Agus y More" }
+        }
+      ]
+    },
+    {
+      "fecha": "2026-10-25",
+      "turnos": [
+        {
+          "turno": "Mañana",
+          "grandes": { "seño": "Mariela", "ayudantes": "Solange" },
+          "peques": { "seño": "Mary", "ayudantes": "Alexis y Lisi" }
+        },
+        {
+          "turno": "Tarde",
+          "grandes": { "seño": "Claudia", "ayudantes": "Bibi" },
+          "peques": { "seño": "Flor", "ayudantes": "Santi y Zele" }
         }
       ]
     }
