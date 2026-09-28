@@ -6,12 +6,12 @@
         {
           "turno": "Mañana",
           "grandes": { "seño": "Anto", "ayudantes": "Raquel" },
-          "peques": { "seño": "Mary", "ayudantes": "Alexis" }
+          "peques": { "seño": "Juli", "ayudantes": "More" }
         },
         {
           "turno": "Tarde",
           "grandes": { "seño": "Andre", "ayudantes": "Lauri" },
-          "peques": { "seño": "Mariela", "ayudantes": "Agus y More" }
+          "peques": { "seño": "Mariela", "ayudantes": "Agus" }
         }
       ]
     },
@@ -26,7 +26,7 @@
         {
           "turno": "Tarde",
           "grandes": { "seño": "Claudia", "ayudantes": "Bibi" },
-          "peques": { "seño": "Flor", "ayudantes": "Santi" }
+          "peques": { "seño": "Vicky", "ayudantes": "Luci" }
         }
       ]
     },
@@ -36,12 +36,12 @@
         {
           "turno": "Mañana",
           "grandes": { "seño": "Anto", "ayudantes": "Raquel" },
-          "peques": { "seño": "Juli", "ayudantes": "Luci" }
+          "peques": { "seño": "Mary", "ayudantes": "Alexis y Luci" }
         },
         {
           "turno": "Tarde",
           "grandes": { "seño": "Andre", "ayudantes": "Lauri" },
-          "peques": { "seño": "Vicky", "ayudantes": "Agus y More" }
+          "peques": { "seño": "Flor", "ayudantes": "Santi y More" }
         }
       ]
     },
@@ -51,12 +51,12 @@
         {
           "turno": "Mañana",
           "grandes": { "seño": "Mariela", "ayudantes": "Solange" },
-          "peques": { "seño": "Mary", "ayudantes": "Alexis y Lisi" }
+          "peques": { "seño": "Juli", "ayudantes": "Lisi" }
         },
         {
           "turno": "Tarde",
           "grandes": { "seño": "Claudia", "ayudantes": "Bibi" },
-          "peques": { "seño": "Flor", "ayudantes": "Santi y Zele" }
+          "peques": { "seño": "Ludmi", "ayudantes": "Zele" }
         }
       ]
     }
