@@ -547,7 +547,7 @@ function revisarTurnos(base, etiquetaSemana,   j, baseT, n, etiqueta, p) {
   }
   if (n == 0) {
     avisar(mayus(etiquetaSemana) " tiene la lista de turnos vacía.",
-           "Si ese finde no tiene turnos, está bien dejarlo así: la página lo muestra como \"Sin turnos\". Si le faltan turnos, agregá al menos el de Mañana.")
+           "Si ese finde no tiene turnos, está bien dejarlo así: la página lo muestra como \"Turnos en construcción\". Si le faltan turnos, agregá al menos el de Mañana.")
   }
 }
 

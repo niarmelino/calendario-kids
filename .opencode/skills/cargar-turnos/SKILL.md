@@ -301,7 +301,7 @@ Para reemplazar una fecha existente, editá solo los turnos de esa semana y
 dejá la fecha como está.
 
 Un finde sin turnos se carga igual, con la lista de turnos vacía. Así el
-calendario no muestra huecos y la página avisa "Sin turnos para este finde":
+calendario no muestra huecos y la página avisa "Turnos en construcción":
 
 ```json
     {
@@ -418,7 +418,7 @@ Falta el finde del 31 de octubre (la semana del domingo 2026-11-01).
 
 - **Opción 1**: cargá la semana con los turnos que te pase (Pasos 4 y 5).
 - **Opción 2**: cargá la semana con `"turnos": []`. El calendario queda
-  completo y la página muestra "Sin turnos para este finde".
+  completo y la página muestra "Turnos en construcción".
 - **Opción 3**: no cargues nada. El validador va a seguir avisando del finde
   faltante y eso está bien: es a elección del usuario. Decilo explícitamente
   en el preview y en el cuerpo del PR.
