@@ -19,10 +19,13 @@
     --card-shadow: 0 10px 26px rgba(9,60,57,.14);
   }
   *{box-sizing:border-box;}
-  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  html{scroll-padding-top:env(safe-area-inset-top,0px);background:var(--teal-deep);}
   body{
     margin:0;
-    min-height:100%;
+    /* 100vh y no 100%: con pocas semanas la pagina queda mas corta que la
+       pantalla y el degrade se cortaba a mitad de camino. */
+    min-height:100vh;
+    min-height:100dvh;
     font-family:'Nunito',sans-serif;
     color:var(--ink);
     background:
@@ -172,7 +175,7 @@
   </header>
 
   <div id="schedule"></div>
-  <footer>Para agregar o cambiar turnos, editá <a href="data.json"><code>data.json</code></a> y recargá la página. Solo se muestran las semanas desde hoy en adelante.</footer>
+  <footer>Para cambiar turnos, comunicate con Andre, Mari o Anto.</footer>
 </div>
 
 <script>
@@ -223,21 +226,28 @@ function grupoCard(grupo, clase){
 }
 
 function semanaHTML(sem){
-  return `
-  <section class="week">
-    <h2>${tituloSemana(sem)}</h2>
+  const turnos = Array.isArray(sem.turnos) ? sem.turnos : [];
+  // Un finde sin turnos se carga con "turnos": [] y se avisa que no hay.
+  const cabecera = turnos.length ? `
     <div class="cols-head">
       <span></span>
       <span class="grandes">Grandes (7 a 12 años)</span>
       <span class="peques">Peques (4 a 6/7 años)</span>
-    </div>
-    ${(sem.turnos || []).map(t => `
+    </div>` : '';
+  const cuerpo = turnos.length
+    ? turnos.map(t => `
       <div class="turno">
         <div class="turno-label">${esc(t.turno)}</div>
         ${grupoCard(t.grandes, 'grandes-card')}
         ${grupoCard(t.peques, 'peques-card')}
       </div>
-    `).join('')}
+    `).join('')
+    : '<p class="estado">Sin turnos para este finde.</p>';
+  return `
+  <section class="week">
+    <h2>${tituloSemana(sem)}</h2>
+    ${cabecera}
+    ${cuerpo}
   </section>
 `;
 }
