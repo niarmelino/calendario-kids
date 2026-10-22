@@ -4,9 +4,17 @@
 #
 #   bash validar-data.sh              revisa data.json del repo
 #   bash validar-data.sh otra.json    revisa otro archivo
+#   bash validar-data.sh --cobertura 2026-10 [2026-11 ...]
+#                                      revisa que no falte ningun finde
 #
 # Sale con codigo 0 si se puede publicar y 1 si hay problemas.
 # Los AVISO no bloquean la carga, los PROBLEMA si.
+# En modo --cobertura sale con 1 si falta algun finde de los meses pedidos.
+#
+# Que es un finde: cada mes tiene 4 o 5 findes y el cronograma tiene que
+# tenerlos todos. Cada finde se carga con la fecha del DOMINGO que arranca
+# esa semana (el finde del 31 de octubre va con "fecha": "2026-11-01").
+# Un finde sin turnos se carga igual, con "turnos": [].
 #
 # Solo necesita bash, awk y las utilidades de texto basicas.
 
@@ -14,7 +22,43 @@ set -u
 
 DIR_SCRIPT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RAIZ="$(cd "$DIR_SCRIPT/../../.." && pwd)"
-ARCHIVO="${1:-$RAIZ/data.json}"
+
+MODO="validar"
+MESES=""
+CON=""
+ARCHIVO="$RAIZ/data.json"
+
+if [[ "${1:-}" == "--cobertura" ]]; then
+  MODO="cobertura"
+  shift
+  for arg in "$@"; do
+    if [[ "$arg" =~ ^[0-9]{4}-[0-9]{2}$ ]]; then
+      anio=$((10#${arg:0:4}))
+      mes=$((10#${arg:5:2}))
+      if [[ "$mes" -lt 1 || "$mes" -gt 12 || "$anio" -lt 1970 ]]; then
+        echo "Ese mes no existe: $arg" >&2
+        echo "Escribilo como AAAA-MM, por ejemplo 2026-10." >&2
+        exit 2
+      fi
+      MESES="$MESES $arg"
+    elif [[ "$arg" =~ ^--con= ]]; then
+      CON="${arg#--con=}"
+    elif [[ "$arg" == *.json ]]; then
+      ARCHIVO="$arg"
+    else
+      echo "No entiendo el argumento: $arg" >&2
+      echo "Uso: bash validar-data.sh --cobertura 2026-10 [--con=2026-11-01,2026-11-08] [archivo.json]" >&2
+      exit 2
+    fi
+  done
+  MESES="${MESES# }"
+  if [[ -z "$MESES" ]]; then
+    echo "Falta el mes a revisar. Uso: bash validar-data.sh --cobertura 2026-10" >&2
+    exit 2
+  fi
+elif [[ -n "${1:-}" ]]; then
+  ARCHIVO="$1"
+fi
 
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
@@ -241,6 +285,21 @@ function diasDesdeEpoch(a, m, d,   t, c) {
 }
 # 0 = domingo. El 1 de enero de 1970 fue jueves.
 function diaDeSemana(a, m, d) { return (diasDesdeEpoch(a, m, d) + 4) % 7 }
+function iso(a, m, d) { return sprintf("%04d-%02d-%02d", a, m, d) }
+function isoDeEpoch(d,   a, m, t) {
+  a = 1970
+  while (1) {
+    t = esBisiesto(a) ? 366 : 365
+    if (d < t) break
+    d -= t; a++
+  }
+  for (m = 1; m <= 12; m++) {
+    t = diasEnMes(a, m)
+    if (d < t) break
+    d -= t
+  }
+  return iso(a, m, d + 1)
+}
 
 function conDe(t) {
   if (substr(t, 1, 4) == "el ") return "del " substr(t, 5)
@@ -339,6 +398,41 @@ function revisar(   i, j, r, base, semana, camino, k) {
   }
   if (!tuvoSemana) {
     avisar("No hay ninguna semana cargada.", "Agregá al menos una semana dentro de \"semanas\".")
+  } else {
+    revisarHuecos()
+  }
+}
+
+# Si entre dos semanas cargadas hay un salto de mas de una semana, falta
+# alguna semana en el medio. Un finde sin turnos se carga igual, con la lista
+# de turnos vacia, asi que una semana que no esta cargada es un error.
+function revisarHuecos(   n, i, j, k, arr, t, p1, p2, a1, m1, d1, a2, m2, d2, dif, e1, e2, e, faltan, nf) {
+  n = 0
+  for (k in cargada) arr[++n] = k
+  for (i = 2; i <= n; i++) {
+    t = arr[i]; j = i - 1
+    while (j >= 1 && arr[j] > t) { arr[j + 1] = arr[j]; j-- }
+    arr[j + 1] = t
+  }
+  for (i = 1; i < n; i++) {
+    if (!esDomingo[arr[i]] || !esDomingo[arr[i + 1]]) continue
+    split(arr[i], p1, "-"); a1 = p1[1] + 0; m1 = p1[2] + 0; d1 = p1[3] + 0
+    split(arr[i + 1], p2, "-"); a2 = p2[1] + 0; m2 = p2[2] + 0; d2 = p2[3] + 0
+    e1 = diasDesdeEpoch(a1, m1, d1); e2 = diasDesdeEpoch(a2, m2, d2)
+    dif = e2 - e1
+    if (dif <= 7) continue
+    faltan = ""; nf = 0
+    for (e = e1 + 7; e < e2; e += 7) {
+      nf++
+      faltan = faltan (nf > 1 ? " y del " : "") isoDeEpoch(e)
+    }
+    if (nf == 1) {
+      fallar("Entre la semana del " arr[i] " y la del " arr[i + 1] " falta la semana del " faltan ".",
+             "Cargá la semana que falta en data.json. Si ese finde no tiene turnos, dejala con \"turnos\": [].")
+    } else {
+      fallar("Entre la semana del " arr[i] " y la del " arr[i + 1] " faltan las semanas del " faltan ".",
+             "Cargá las semanas que faltan en data.json. Si esos findes no tienen turnos, dejalas con \"turnos\": [].")
+    }
   }
 }
 
@@ -374,6 +468,8 @@ function revisarSemana(base, semana,   p, fecha, a, m, d, etiqueta, f, fechaOk) 
       } else {
         f = diaDeSemana(a, m, d)
         fechaOk = 1
+        cargada[fecha] = 1
+        esDomingo[fecha] = (f == 0)
         if (f != 0) {
           avisar("La fecha de " etiqueta " es " DIAS[f] ", no domingo.",
                  "El cronograma arranca los domingos, una semana por fecha. Si te equivocaste de día, corregilo; si fue a propósito, dejalo así.")
@@ -450,8 +546,8 @@ function revisarTurnos(base, etiquetaSemana,   j, baseT, n, etiqueta, p) {
     }
   }
   if (n == 0) {
-    avisar(mayus(etiquetaSemana) " no tiene ningún turno cargado.",
-           "Si todavía no definís los turnos, agregá al menos el de Mañana.")
+    avisar(mayus(etiquetaSemana) " tiene la lista de turnos vacía.",
+           "Si ese finde no tiene turnos, está bien dejarlo así: la página lo muestra como \"Sin turnos\". Si le faltan turnos, agregá al menos el de Mañana.")
   }
 }
 
@@ -499,6 +595,136 @@ if [[ "$MAL_FORMADO" -eq 0 ]]; then
   awk -v _AVISOS="$AVISOS" -v _PROBLEMAS="$PROBLEMAS" -f "$TMP/schema.awk" "$MAPA" > /dev/null
 fi
 
+# ---------------------------------------------------- revision de cobertura
+# Cada mes tiene 4 o 5 findes. El cronograma tiene que tenerlos todos, y
+# cada finde se carga con la fecha del domingo que lo arranca. Este bloque
+# calcula que findes le tocan a cada mes y avisa de los que no estan cargados.
+#
+# En el modo normal (sin --cobertura) la falta de un finde es un AVISO: no
+# bloquea. En el modo --cobertura es un PROBLEMA y el script sale con 1.
+
+cat > "$TMP/cobertura.awk" <<'AWK_COB'
+function esBisiesto(a) { return (a % 4 == 0 && a % 100 != 0) || a % 400 == 0 }
+function diasEnMes(a, m) {
+  if (m == 2) return esBisiesto(a) ? 29 : 28
+  if (m == 4 || m == 6 || m == 9 || m == 11) return 30
+  return 31
+}
+function diasDesdeEpoch(a, m, d,   t, c) {
+  t = 0
+  for (c = 1970; c < a; c++) t += esBisiesto(c) ? 366 : 365
+  for (c = 1; c < m; c++) t += diasEnMes(a, c)
+  return t + d - 1
+}
+# 0 = domingo ... 6 = sabado
+function diaDeSemana(a, m, d) { return (diasDesdeEpoch(a, m, d) + 4) % 7 }
+function iso(a, m, d) { return sprintf("%04d-%02d-%02d", a, m, d) }
+function diaSiguiente(s,   p, a, m, d) {
+  split(s, p, "-"); a = p[1] + 0; m = p[2] + 0; d = p[3] + 0 + 1
+  if (d > diasEnMes(a, m)) { d = 1; m++; if (m > 12) { m = 1; a++ } }
+  return iso(a, m, d)
+}
+function diaAnterior(s,   p, a, m, d) {
+  split(s, p, "-"); a = p[1] + 0; m = p[2] + 0; d = p[3] + 0 - 1
+  if (d < 1) { m--; if (m < 1) { m = 12; a-- } d = diasEnMes(a, m) }
+  return iso(a, m, d)
+}
+function fechaLegible(s,   p, d) { split(s, p, "-"); d = p[3] + 0; return d " de " MES[p[2] + 0] " de " p[1] }
+function mesLegible(s,   p) { split(s, p, "-"); return MES[p[2] + 0] " de " p[1] }
+
+function reportar(msg, pista) {
+  printf "%s  %s\n          -> %s\n\n", sev, msg, pista >> _SALIDA
+}
+
+BEGIN {
+  MES[1]="enero"; MES[2]="febrero"; MES[3]="marzo"; MES[4]="abril"; MES[5]="mayo"; MES[6]="junio"
+  MES[7]="julio"; MES[8]="agosto"; MES[9]="septiembre"; MES[10]="octubre"; MES[11]="noviembre"; MES[12]="diciembre"
+
+  nCon = split(con, conArr, ",")
+  for (i = 1; i <= nCon; i++) {
+    s = conArr[i]
+    gsub(/[ \t]/, "", s)
+    if (s ~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]$/) extra[s] = 1
+  }
+
+  if (meses == "auto") {
+    automatico = 1
+  } else {
+    nMes = split(meses, mesArr, " ")
+  }
+}
+
+# fechas ya cargadas en data.json
+$1 == "V" && $2 == "string" && $3 ~ /^\$\.semanas\[[0-9]+\]\.fecha$/ {
+  if ($4 ~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]$/) {
+    cargada[$4] = 1
+    mesDe[$4] = substr($4, 1, 7)
+  }
+}
+
+END {
+  if (automatico) {
+    for (f in cargada) {
+      mm = mesDe[f]
+      if (!(mm in mesVisto)) { mesVisto[mm] = 1; mesArr[++nMes] = mm }
+    }
+    for (i = 2; i <= nMes; i++) {
+      t = mesArr[i]; j = i - 1
+      while (j >= 1 && mesArr[j] > t) { mesArr[j + 1] = mesArr[j]; j-- }
+      mesArr[j + 1] = t
+    }
+  }
+
+  for (mi = 1; mi <= nMes; mi++) {
+    mtxt = mesArr[mi]
+    split(mtxt, pp, "-"); a = pp[1] + 0; m = pp[2] + 0
+    faltan = 0; total = 0
+    nd = diasEnMes(a, m)
+    for (d = 1; d <= nd; d++) {
+      dow = diaDeSemana(a, m, d)
+      clave = ""
+      if (dow == 0) clave = iso(a, m, d)
+      else if (dow == 6) clave = diaSiguiente(iso(a, m, d))
+      if (clave == "") continue
+      if (vistoClave[mtxt SUBSEP clave]) continue
+      vistoClave[mtxt SUBSEP clave] = 1
+      total++
+      if ((clave in cargada) || (clave in extra)) continue
+      faltan++
+      if (clave in yaReportado) continue
+      yaReportado[clave] = 1
+      unicos++
+      sabado = diaAnterior(clave)
+      reportar("Falta el finde del " fechaLegible(sabado) " (la semana del domingo " clave ").",
+               "Cargá esa semana en data.json. Si ese finde no tiene turnos, dejala con \"turnos\": [].")
+    }
+    printf "COB_RESUMEN\t%s\t%d\t%d\n", mesLegible(mtxt), faltan, total
+  }
+  printf "COB_TOTAL\t%d\n", unicos
+}
+AWK_COB
+
+COB_RESUMEN=""
+if [[ "$MAL_FORMADO" -eq 0 ]]; then
+  if [[ "$MODO" == "cobertura" ]]; then
+    COB_MESES="$MESES"
+    COB_SEV="PROBLEMA"
+    COB_SALIDA="$PROBLEMAS"
+  else
+    COB_MESES="auto"
+    COB_SEV="AVISO"
+    COB_SALIDA="$AVISOS"
+  fi
+  COB_RESUMEN="$(awk -v _SALIDA="$COB_SALIDA" -v sev="$COB_SEV" -v meses="$COB_MESES" -v con="$CON" \
+    -f "$TMP/cobertura.awk" "$MAPA" 2>/dev/null)"
+else
+  if [[ "$MODO" == "cobertura" ]]; then
+    fallar \
+      'No se puede revisar la cobertura de findes porque el archivo no está bien formado.' \
+      'Primero corregí los problemas de formato del archivo y volvé a correr el comando.'
+  fi
+fi
+
 # ------------------------------------------------------------------ reporte
 
 N_AVISOS=$(grep -c '^AVISO' "$AVISOS" 2>/dev/null); N_AVISOS=${N_AVISOS:-0}
@@ -507,7 +733,38 @@ N_PROBLEMAS=$(grep -c '^PROBLEMA' "$PROBLEMAS" 2>/dev/null); N_PROBLEMAS=${N_PRO
 if [[ "$N_AVISOS" -gt 0 ]]; then cat "$AVISOS"; fi
 if [[ "$N_PROBLEMAS" -gt 0 ]]; then cat "$PROBLEMAS"; fi
 
+N_FALTAN_COB=0
+if [[ -n "$COB_RESUMEN" ]]; then
+  while IFS=$'\t' read -r marca etiqueta faltan total; do
+    if [[ "$marca" == "COB_TOTAL" ]]; then
+      N_FALTAN_COB="$etiqueta"
+      continue
+    fi
+    [[ "$marca" == "COB_RESUMEN" ]] || continue
+    if [[ "$faltan" -gt 0 ]]; then
+      echo "Cobertura de $etiqueta: $total findes, falta $faltan."
+    else
+      echo "Cobertura de $etiqueta: $total findes, están todos."
+    fi
+  done <<< "$COB_RESUMEN"
+  echo
+fi
+
 NOMBRE="$(basename "$ARCHIVO")"
+
+if [[ "$MODO" == "cobertura" ]]; then
+  if [[ "$N_FALTAN_COB" -gt 0 ]]; then
+    echo "Falta cargar $N_FALTAN_COB finde(s) antes de publicar."
+    exit 1
+  fi
+  if [[ "$N_PROBLEMAS" -gt 0 ]]; then
+    echo "Falta corregir $N_PROBLEMAS problema(s) antes de publicar."
+    exit 1
+  fi
+  echo "Listo: no falta ningún finde y $NOMBRE se puede publicar."
+  exit 0
+fi
+
 if [[ "$N_PROBLEMAS" -eq 0 && "$N_AVISOS" -eq 0 ]]; then
   echo "Listo: $NOMBRE está bien y se puede publicar."
 elif [[ "$N_PROBLEMAS" -eq 0 ]]; then

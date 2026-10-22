@@ -50,15 +50,19 @@
       "turnos": [
         {
           "turno": "Mañana",
-          "grandes": { "seño": "Mariela", "ayudantes": "Solange" },
-          "peques": { "seño": "Juli", "ayudantes": "Lisi" }
+          "grandes": { "seño": "Mariela", "ayudantes": "Raquel" },
+          "peques": { "seño": "Juli", "ayudantes": "More" }
         },
         {
           "turno": "Tarde",
           "grandes": { "seño": "Claudia", "ayudantes": "Bibi" },
-          "peques": { "seño": "Ludmi", "ayudantes": "Zele" }
+          "peques": { "seño": "Andre", "ayudantes": "Zele" }
         }
       ]
+    },
+    {
+      "fecha": "2026-11-01",
+      "turnos": []
     }
   ]
 }

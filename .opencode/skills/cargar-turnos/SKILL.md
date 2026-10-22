@@ -27,6 +27,10 @@ creada ni ningún cambio en el working tree.
 - `.opencode/skills/cargar-turnos/validar-data.sh` revisa que `data.json` tenga
   la forma correcta y avisa en español llano. Correlo en el Paso 9, antes de
   commitear. Es bash puro: no necesita Node ni Python.
+- Cada mes tiene 4 o 5 findes y el cronograma tiene que tener **todos** los
+  findes del mes. Cada finde se carga con la fecha del **domingo** que lo
+  arranca: el finde del 31 de octubre va con `"fecha": "2026-11-01"`. Un finde
+  sin turnos se carga igual, con `"turnos": []`.
 - Los mensajes de commit del repo van en español, en imperativo, capitalizados
   y sin punto final.
 
@@ -296,6 +300,16 @@ Respetá el formato existente: 2 espacios de indentación, los objetos de
 Para reemplazar una fecha existente, editá solo los turnos de esa semana y
 dejá la fecha como está.
 
+Un finde sin turnos se carga igual, con la lista de turnos vacía. Así el
+calendario no muestra huecos y la página avisa "Sin turnos para este finde":
+
+```json
+    {
+      "fecha": "2026-11-01",
+      "turnos": []
+    }
+```
+
 Usá la herramienta `edit`, no reescribas el archivo entero: menos riesgo de
 tocar lo demás.
 
@@ -333,6 +347,9 @@ Chequea:
 - que no haya dos semanas con la misma fecha,
 - que estén en orden cronológico, de la más antigua a la más reciente. Esto es
   `PROBLEMA`, no `AVISO`: si el orden está mal, no se puede publicar,
+- que no falte ninguna semana **entre medio** de dos semanas cargadas. Esto
+  también es `PROBLEMA`: si un finde no tiene turnos, se carga con
+  `"turnos": []`, nunca se deja sin cargar,
 - que estén `turno`, `grandes.seño` y `peques.seño`, y que `ayudantes` no esté
   vacío,
 - datos con el nombre mal escrito (por ejemplo `ayudante` en vez de
@@ -348,7 +365,68 @@ git diff data.json
 
 Y confirmá que no se modificaron semanas que no estaban en el preview.
 
-## Paso 10 — Ofrecer la previsualización local
+El validador también avisa (como `AVISO`, sin bloquear) si a un mes le falta
+algún finde. Ese chequeo va aparte, en el Paso 10.
+
+## Paso 10 — Chequear que no falte ningún finde
+
+Este paso **bloquea** el resto del flujo: sin cobertura no se commitea ni se
+abre el PR.
+
+Cada mes tiene 4 o 5 findes y el cronograma tiene que tenerlos todos. El
+validador calcula qué findes le tocan a cada mes (cada finde cuenta con la
+fecha del **domingo** que lo arranca) y avisa de los que faltan:
+
+```bash
+# Windows (Git Bash)
+bash .opencode/skills/cargar-turnos/validar-data.sh --cobertura 2026-10
+
+# Linux / macOS
+.opencode/skills/cargar-turnos/validar-data.sh --cobertura 2026-10
+```
+
+Revisá **todos los meses** que tocaron las fechas pedidas:
+
+```bash
+bash .opencode/skills/cargar-turnos/validar-data.sh --cobertura 2026-10 2026-11
+```
+
+Si en este mismo paso vas a cargar un finde que todavía no está en el archivo,
+pasalo con `--con` para que el script no lo marque como faltante:
+
+```bash
+bash .opencode/skills/cargar-turnos/validar-data.sh --cobertura 2026-10 --con=2026-11-01
+```
+
+El script sale con código 1 si falta algún finde y 0 si están todos.
+
+### Si falta un finde: preguntá y esperá
+
+Si el script marca un finde faltante, **no sigas**. Mostrale al usuario qué
+finde falta y preguntale qué hacer:
+
+```
+Falta el finde del 31 de octubre (la semana del domingo 2026-11-01).
+¿Qué querés hacer?
+
+1. Cargar esa semana con sus turnos
+2. Cargar esa semana sin turnos ("turnos": []), porque ese finde no tiene turnos
+3. Dejarla sin cargar
+```
+
+**Esperá la respuesta antes de seguir.** Con la respuesta:
+
+- **Opción 1**: cargá la semana con los turnos que te pase (Pasos 4 y 5).
+- **Opción 2**: cargá la semana con `"turnos": []`. El calendario queda
+  completo y la página muestra "Sin turnos para este finde".
+- **Opción 3**: no cargues nada. El validador va a seguir avisando del finde
+  faltante y eso está bien: es a elección del usuario. Decilo explícitamente
+  en el preview y en el cuerpo del PR.
+
+Después de resolverlo, volvé a correr el chequeo de cobertura y seguí al
+Paso 11.
+
+## Paso 11 — Ofrecer la previsualización local
 
 Con el archivo ya editado y **antes de commitear**, ofrecele al usuario
 levantar el servidor para que mire el resultado en el navegador.
@@ -378,7 +456,7 @@ Stop-Process -Id <pid> -Force
 
 No dejes el servidor corriendo al terminar.
 
-## Paso 11 — Commit, push y PR
+## Paso 12 — Commit, push y PR
 
 ```bash
 git add data.json
@@ -416,6 +494,9 @@ pusheaste, no borres la rama sin preguntar.
 ## Qué NO hacer
 
 - No commitees, pushees ni abras el PR sin la confirmación del Paso 6.
+- No avances al commit ni abras el PR si el chequeo de cobertura del Paso 10
+  dice que falta un finde: preguntale al usuario qué hacer y esperá la
+  respuesta.
 - No inventes seños ni fechas que el usuario no dio.
 - No copies la fecha como la escribió: siempre ISO.
 - No interpretes `10/4` como 4 de octubre. Es 10 de abril.
