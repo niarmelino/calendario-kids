@@ -200,13 +200,18 @@ function hoyLocal(){
 }
 
 function tituloSemana(sem){
-  if (typeof sem.titulo === 'string' && sem.titulo.trim()) return esc(sem.titulo);
   const d = aFechaLocal(sem.fecha);
-  if (!d) return esc(sem.fecha);
-  const txt = d.toLocaleDateString('es-AR', {
-    weekday: 'long', day: 'numeric', month: 'long'
-  });
-  return esc(txt.charAt(0).toUpperCase() + txt.slice(1));
+  let fechaTxt = sem.fecha;
+  if (d) {
+    fechaTxt = d.toLocaleDateString('es-AR', {
+      weekday: 'long', day: 'numeric', month: 'long'
+    });
+    fechaTxt = fechaTxt.charAt(0).toUpperCase() + fechaTxt.slice(1);
+  }
+  if (typeof sem.titulo === 'string' && sem.titulo.trim()) {
+    return esc(fechaTxt + ' - Tema: ' + sem.titulo.trim());
+  }
+  return esc(fechaTxt);
 }
 
 // Un mismo renderer para Grandes y Peques: si el grupo trae "ayudantes", se
