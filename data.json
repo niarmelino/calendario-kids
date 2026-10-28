@@ -62,7 +62,80 @@
     },
     {
       "fecha": "2026-11-01",
-      "turnos": []
+      "titulo": "La luz es Jesús",
+      "turnos": [
+        {
+          "turno": "Mañana",
+          "grandes": { "seño": "Anto", "ayudantes": "Solange" },
+          "peques": { "seño": "Andrea" }
+        },
+        {
+          "turno": "Tarde",
+          "grandes": { "seño": "Mari M.", "ayudantes": "Laura" },
+          "peques": { "seño": "Claudia", "ayudantes": "Agus" }
+        }
+      ]
+    },
+    {
+      "fecha": "2026-11-08",
+      "titulo": "La armadura de Dios",
+      "turnos": [
+        {
+          "turno": "Mañana",
+          "grandes": { "seño": "Anto", "ayudantes": "Raquel" },
+          "peques": { "seño": "Vicky", "ayudantes": "Luci" }
+        },
+        {
+          "turno": "Tarde",
+          "grandes": { "seño": "Mari M.", "ayudantes": "Bibi" },
+          "peques": { "seño": "Andrea", "ayudantes": "More" }
+        }
+      ]
+    },
+    {
+      "fecha": "2026-11-15",
+      "turnos": [
+        {
+          "turno": "Mañana",
+          "grandes": { "seño": "Anita", "ayudantes": "Solange" },
+          "peques": { "seño": "Mary A.", "ayudantes": "Alexis" }
+        },
+        {
+          "turno": "Tarde",
+          "grandes": { "seño": "Mari M.", "ayudantes": "Laura" },
+          "peques": { "seño": "Juli", "ayudantes": "Agus" }
+        }
+      ]
+    },
+    {
+      "fecha": "2026-11-22",
+      "turnos": [
+        {
+          "turno": "Mañana",
+          "grandes": { "seño": "Anto", "ayudantes": "Solange" },
+          "peques": { "seño": "Andrea" }
+        },
+        {
+          "turno": "Tarde",
+          "grandes": { "seño": "Andre", "ayudantes": "Sol P." },
+          "peques": { "seño": "Vicky", "ayudantes": "More" }
+        }
+      ]
+    },
+    {
+      "fecha": "2026-11-29",
+      "turnos": [
+        {
+          "turno": "Mañana",
+          "grandes": { "seño": "Anita", "ayudantes": "Raquel" },
+          "peques": { "seño": "Mary A.", "ayudantes": "Alexis" }
+        },
+        {
+          "turno": "Tarde",
+          "grandes": { "seño": "Mari M.", "ayudantes": "Laura" },
+          "peques": { "seño": "Juli", "ayudantes": "Agus" }
+        }
+      ]
     }
   ]
 }
