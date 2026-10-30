@@ -66,8 +66,8 @@
       "turnos": [
         {
           "turno": "Mañana",
-          "grandes": { "seño": "Anto", "ayudantes": "Solange" },
-          "peques": { "seño": "Marce", "ayudantes": "Andre" }
+          "grandes": { "seño": "Marce", "ayudantes": "Solange" },
+          "peques": { "seño": "Anto", "ayudantes": "Andre" }
         },
         {
           "turno": "Tarde",
