@@ -98,12 +98,12 @@
         {
           "turno": "Mañana",
           "grandes": { "seño": "Anita", "ayudantes": "Solange" },
-          "peques": { "seño": "Mary A.", "ayudantes": "Alexis" }
+          "peques": { "seño": "Flor", "ayudantes": "Santi" }
         },
         {
           "turno": "Tarde",
           "grandes": { "seño": "Mari M.", "ayudantes": "Laura" },
-          "peques": { "seño": "Juli", "ayudantes": "Agus" }
+          "peques": { "seño": "Claudia", "ayudantes": "Agus" }
         }
       ]
     },
@@ -112,12 +112,12 @@
       "turnos": [
         {
           "turno": "Mañana",
-          "grandes": { "seño": "Anto", "ayudantes": "Solange" },
-          "peques": { "seño": "Andrea" }
+          "grandes": { "seño": "Anto", "ayudantes": "Raquel" },
+          "peques": { "seño": "Mary A.", "ayudantes": "Alexis" }
         },
         {
           "turno": "Tarde",
-          "grandes": { "seño": "Andre", "ayudantes": "Sol P." },
+          "grandes": { "seño": "Claudia", "ayudantes": "Sol P." },
           "peques": { "seño": "Vicky", "ayudantes": "More" }
         }
       ]
@@ -127,7 +127,7 @@
       "turnos": [
         {
           "turno": "Mañana",
-          "grandes": { "seño": "Anita", "ayudantes": "Raquel" },
+          "grandes": { "seño": "Anita", "ayudantes": "Solange" },
           "peques": { "seño": "Mary A.", "ayudantes": "Alexis" }
         },
         {
