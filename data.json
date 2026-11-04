@@ -78,7 +78,7 @@
     },
     {
       "fecha": "2026-11-08",
-      "titulo": "La armadura de Dios",
+      "titulo": "La armadura de Dios.Repaso completo",
       "turnos": [
         {
           "turno": "Mañana",
@@ -87,8 +87,8 @@
         },
         {
           "turno": "Tarde",
-          "grandes": { "seño": "Mari M.", "ayudantes": "Bibi" },
-          "peques": { "seño": "Andrea", "ayudantes": "More" }
+          "grandes": { "seño": "Andre", "ayudantes": "Bibi" },
+          "peques": { "seño": "Andre", "ayudantes": "More" }
         }
       ]
     },
@@ -117,7 +117,7 @@
         },
         {
           "turno": "Tarde",
-          "grandes": { "seño": "Claudia", "ayudantes": "Sol P." },
+          "grandes": { "seño": "Andre", "ayudantes": "Sol P." },
           "peques": { "seño": "Vicky", "ayudantes": "More" }
         }
       ]
@@ -132,7 +132,7 @@
         },
         {
           "turno": "Tarde",
-          "grandes": { "seño": "Mari M.", "ayudantes": "Laura" },
+          "grandes": { "seño": "Claudia", "ayudantes": "Laura" },
           "peques": { "seño": "Juli", "ayudantes": "Agus" }
         }
       ]
