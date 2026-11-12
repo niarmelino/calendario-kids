@@ -94,7 +94,7 @@
     },
     {
       "fecha": "2026-11-15",
-      "titulo": "Serie: Navidad: El Salvador Pometido.",
+      "titulo": "Serie: Navidad - Tema: El Salvador Pometido.",
       "turnos": [
         {
           "turno": "Mañana",
@@ -110,7 +110,7 @@
     },
     {
       "fecha": "2026-11-22",
-      "titulo": "Serie: Navidad.",
+      "titulo": "Serie: Navidad.Tema:",
       "turnos": [
         {
           "turno": "Mañana",
@@ -126,6 +126,7 @@
     },
     {
       "fecha": "2026-11-29",
+      "titulo": "Serie: Navidad.Tema:",
       "turnos": [
         {
           "turno": "Mañana",
