@@ -110,7 +110,7 @@
     },
     {
       "fecha": "2026-11-22",
-      "titulo": "Serie: Navidad: El Salvador Pometido.",
+      "titulo": "Serie: Navidad.",
       "turnos": [
         {
           "turno": "Mañana",
@@ -134,8 +134,8 @@
         },
         {
           "turno": "Tarde",
-          "grandes": { "seño": "Claudia", "ayudantes": "Laura" },
-          "peques": { "seño": "Juli", "ayudantes": "Agus" }
+          "grandes": { "seño": "Claudia", "ayudantes": "Bibi" },
+          "peques": { "seño": "Juli", "ayudantes": "Zele" }
         }
       ]
     }
