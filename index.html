@@ -180,6 +180,9 @@
 // Los turnos viven en data.json. Para sumar o cambiar una semana, editá ese
 // archivo: esta página se genera sola al cargar.
 const DATA_URL = 'data.json';
+// Diciembre ya está cargado en data.json, pero se publica recién el 23/11.
+// Las semanas anteriores no se tocan: se siguen mostrando como siempre.
+const PUBLICACION = { desde: '2026-12-01', mostrar: '2026-11-23' };
 
 const root = document.getElementById('schedule');
 
@@ -266,11 +269,14 @@ function estadoHTML(titulo, detalle){
 
 function render(data){
   const hoy = hoyLocal();
+  const desde = aFechaLocal(PUBLICACION.desde);
+  const mostrar = aFechaLocal(PUBLICACION.mostrar);
   const semanas = (data && Array.isArray(data.semanas)) ? data.semanas : [];
 
   const futuras = semanas
     .map(sem => ({ sem, fecha: aFechaLocal(sem && sem.fecha) }))
     .filter(item => item.fecha && item.fecha.getTime() >= hoy.getTime())
+    .filter(item => !(desde && mostrar && hoy < mostrar && item.fecha >= desde))
     .sort((a, b) => a.fecha - b.fecha)
     .map(item => item.sem);
 
