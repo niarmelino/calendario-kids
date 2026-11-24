@@ -151,7 +151,7 @@
         },
         {
           "turno": "Tarde",
-          "grandes": { "seño": "Anita", "ayudantes": "Sol P" },
+          "grandes": { "seño": "Claudia", "ayudantes": "Sol P" },
           "peques": { "seño": "Vicky", "ayudantes": "Zele" }
         }
       ]
@@ -174,12 +174,12 @@
     },
     {
       "fecha": "2026-12-20",
-      "titulo": "Serie: Navidad.Tema:",
+      "titulo": "No habrá Iglesia Kids",
       "turnos": []
     },
     {
       "fecha": "2026-12-27",
-      "titulo": "Serie: Navidad.Tema:",
+      "titulo": "No habrá Iglesia Kids",
       "turnos": []
     }
   ]
